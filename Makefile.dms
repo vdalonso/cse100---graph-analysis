@@ -1,0 +1,22 @@
+CC=g++
+CXXFLAGS=-std=c++11
+LDFLAGS=
+
+ifeq ($(type),opt)
+	    CPPFLAGS += -O3
+		    LDFLAGS += -O3
+		else
+		    CPPFLAGS += -g
+			    LDFLAGS += -g
+			endif
+
+all: pathfinder socialgathering
+
+pathfinder: Graph.o
+
+socialgathering: Graph.o
+
+Graph.o: Node.hpp Graph.hpp
+
+clean:
+		rm -f pathfinder *.o core*
