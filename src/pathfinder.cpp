@@ -28,9 +28,20 @@ int main(int argc, char* argv[]) {
   char* pairs_filename = argv[2];
   char* output_filename = argv[3];
 
+  cout << "i wonder if this will work \n";
+
   //TODO   
  /* You can call the pathfinder function from here */
 
+  Graph mygraph;
+  mygraph.loadFromFile(graph_filename);
 
+  vector<string> paths = mygraph.splice(pairs_filename);
+  for(unsigned int i = 0; i < paths.size() ; i++){
+	cout << paths[i] << endl;
+  }
+	
+
+  cout << "This is the end.\n";
     
 }  
