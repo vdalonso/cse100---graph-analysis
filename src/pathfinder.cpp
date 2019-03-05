@@ -36,12 +36,21 @@ int main(int argc, char* argv[]) {
   Graph mygraph;
   mygraph.loadFromFile(graph_filename);
 
+  ofstream outfile(output_filename);
+  
+
+  
+
   vector<string> paths = mygraph.splice(pairs_filename);
   for(unsigned int i = 0; i < paths.size() ; i++){
-	cout << paths[i] << endl;
+	//cout << paths[paths.size()-(1+i)] << endl;
+	outfile << paths[paths.size()-(1+i)] << endl;
+
   }
+
+  
 	
 
-  cout << "This is the end.\n";
+  //cout << "This is the end.\n";
     
 }  

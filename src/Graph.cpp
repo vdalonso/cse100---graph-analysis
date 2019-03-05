@@ -4,11 +4,12 @@
 #include <algorithm>
 #include <fstream>
 #include <iostream>
-#include <limits>
+#include <climits>
 #include <set>
 #include <sstream>
 #include <string>
 #include <utility>
+#include <queue>
 
 using namespace std;
 
@@ -35,8 +36,13 @@ void Graph::addNode(string id1, string id2 ){
 		Node* n2 = new Node();
 		nodes.insert({id2,n2});
 	}
+
+	//undirected graph
 	nodes[id1]->adj[id2] = nodes[id2];
-	nodes[id2]->adj[id1] = nodes[id1];	
+	nodes[id1]->id = id1;
+
+	nodes[id2]->adj[id1] = nodes[id1];
+	nodes[id2]->id = id2;
 	
 }
 //this method is for finding pairs. calls pathfinder.
@@ -44,6 +50,8 @@ vector<string> Graph::splice(const char* in_filename){
 	ifstream infile(in_filename);
 	vector<string> paths;
 	int count = 0;
+	
+	//cout << "this is inside the splice function.\n";
 	
 	while(infile){
 	string s;
@@ -61,14 +69,25 @@ vector<string> Graph::splice(const char* in_filename){
     	if (record.size() != 2) {
     	  continue;
    	}
+
+	//cout << record[0] << " , " << record[1] <<endl;
+	
+
+	//check if these nodes actually exist.
 	
 	Node* n1 = nodes[record[0]];
 	Node* n2 = nodes[record[1]];
-	paths[count] = pathfinder(n1,n2);
+
+	paths.push_back( pathfinder(n1 , n2));
 	
+	//cout << "read line\n";	
 	
 	count++;	
 	}
+	
+		
+	//cout << "exiting splice\n";
+	//cout << "count\n";
 	return paths;
 
 }
@@ -107,7 +126,7 @@ bool Graph::loadFromFile(const char* in_filename) {
     return false;
   }
   
-  cout << count << endl;
+  //cout << count << endl;
   infile.close();
   return true;
 }
@@ -115,8 +134,60 @@ bool Graph::loadFromFile(const char* in_filename) {
 /* Implement pathfinder*/
 //TODO 
 string Graph::pathfinder(Node* from, Node* to) {
+	//initialize  dist and prev to infinity and nullptr respectively.
+	for(auto n = nodes.begin(); n != nodes.end() ; n++){
+		n->second->dist = INT_MAX;
+		n->second->prev = nullptr;
+	}
+	//initialize the queue. push source node in, set its distance to 0.
+	queue<Node*> q;
+	q.push(from);
+	from->dist = 0;
 
+	//cout << "this is inside the pathfinder function \n";
+	
+	//set distances for everyone.
+	while(!q.empty()){
+		Node * curr = q.front();
+		q.pop();
 
+		for(auto i = curr->adj.begin() ; i != curr->adj.end() ; i++){
+			if(i->second->dist == INT_MAX){
+				i->second->dist = curr->dist + 1;
+				i->second->prev = curr;
+				q.push(i->second);
+			}
+			//check
+			//q.push(i->second);
+		}
+	}
+	//cout << "this is after the while loop inside pathfinder \n";
+
+		
+	string path = "";
+
+	//check if node * to was even reached.
+	if(to->dist == INT_MAX)
+		return path;
+	
+	//if not start creating the path;
+	Node * back = to;
+	while(back->prev != nullptr){
+		path = " " + back->id + path;
+		
+		//cout << "ID: " << back->id << " prev: " << back->prev->id << endl;
+
+		//if(back->prev == nullptr)
+		//	cout << "this thing is null despite there being an ID for it.\n";
+	
+		back = back->prev;
+	}
+	//cout << "leaving pathfinder\n";
+	path = back->id + path;
+
+	//cout << path << endl;
+
+	return path;	
   
 }
 

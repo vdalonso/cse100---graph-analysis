@@ -11,8 +11,11 @@ using namespace std;
 class Node{
 public:
 	unordered_map<string , Node*> adj;
+	string id;
+
 	bool visited;
-	int prev;
+	Node * prev;
+	int dist;
 
 	Node() : adj(0) , visited(0) , prev(0){}
 
