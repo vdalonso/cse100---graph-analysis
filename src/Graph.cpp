@@ -74,13 +74,29 @@ vector<string> Graph::splice(const char* in_filename){
 	
 
 	//check if these nodes actually exist.
-	
-	Node* n1 = nodes[record[0]];
-	Node* n2 = nodes[record[1]];
+	//Node* n1 = nodes[record[0]];
+	//Node* n2 = nodes[record[1]];
 
-	paths.push_back( pathfinder(n1 , n2));
+	//this if statement needs to be changed.	
+	if(nodes.find(record[0]) == nodes.end() || nodes.find(record[1]) == nodes.end() ){
+		paths.push_back(" ");
+		//cout << "IDs in line: " << count << " doesn't exist in our graph \n";
+	}
+	else{
+		Node* n1 = nodes[record[0]];
+		Node* n2 = nodes[record[1]];
 	
-	//cout << "read line\n";	
+		//cout << "IDs in line: " << count << " does exist in our graph \n";
+		//cout << n1->id << " " << n2->id << endl;
+		
+		paths.push_back( pathfinder(n1 , n2));
+
+	}
+
+	//paths.push_back( pathfinder(n1 , n2));
+	
+	//cout << "read line\n";
+	//cout << pathfinder(n1 , n2) << endl;	
 	
 	count++;	
 	}
@@ -135,10 +151,14 @@ bool Graph::loadFromFile(const char* in_filename) {
 //TODO 
 string Graph::pathfinder(Node* from, Node* to) {
 	//initialize  dist and prev to infinity and nullptr respectively.
+	
+	//cout << "before the for loop in pathfinder function\n";
 	for(auto n = nodes.begin(); n != nodes.end() ; n++){
 		n->second->dist = INT_MAX;
 		n->second->prev = nullptr;
 	}
+	//cout << "after the for loop in pathfinder function\n";	
+
 	//initialize the queue. push source node in, set its distance to 0.
 	queue<Node*> q;
 	q.push(from);
@@ -166,7 +186,7 @@ string Graph::pathfinder(Node* from, Node* to) {
 		
 	string path = "";
 
-	//check if node * to was even reached.
+	//check if node * to was even reached. IE nodes aren't connected.
 	if(to->dist == INT_MAX)
 		return path;
 	

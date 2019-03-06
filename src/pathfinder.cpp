@@ -44,7 +44,8 @@ int main(int argc, char* argv[]) {
   vector<string> paths = mygraph.splice(pairs_filename);
   for(unsigned int i = 0; i < paths.size() ; i++){
 	//cout << paths[paths.size()-(1+i)] << endl;
-	outfile << paths[paths.size()-(1+i)] << endl;
+	//outfile << paths[paths.size()-(1+i)] << endl;
+	outfile << paths[i] << endl;
 
   }
 
