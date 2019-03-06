@@ -23,7 +23,6 @@ Graph::~Graph(void) {
 }
 
 /* Add a node to the graph representing person with id idNumber and add a connection between two nodes in the graph. */
-//TODO
 
 void Graph::addNode(string id1, string id2 ){
 
@@ -37,7 +36,7 @@ void Graph::addNode(string id1, string id2 ){
 		nodes.insert({id2,n2});
 	}
 
-	//undirected graph
+	//undirected graph: for each pair, add both in both's adj list.
 	nodes[id1]->adj[id2] = nodes[id2];
 	nodes[id1]->id = id1;
 
@@ -50,9 +49,7 @@ vector<string> Graph::splice(const char* in_filename){
 	ifstream infile(in_filename);
 	vector<string> paths;
 	int count = 0;
-	
-	//cout << "this is inside the splice function.\n";
-	
+		
 	while(infile){
 	string s;
     	if (!getline(infile, s)) break;
@@ -70,40 +67,22 @@ vector<string> Graph::splice(const char* in_filename){
     	  continue;
    	}
 
-	//cout << record[0] << " , " << record[1] <<endl;
-	
-
-	//check if these nodes actually exist.
-	//Node* n1 = nodes[record[0]];
-	//Node* n2 = nodes[record[1]];
-
-	//this if statement needs to be changed.	
+	//check if either node doesn't exist. if it does not, ignore that pair.	
 	if(nodes.find(record[0]) == nodes.end() || nodes.find(record[1]) == nodes.end() ){
 		paths.push_back(" ");
 		//cout << "IDs in line: " << count << " doesn't exist in our graph \n";
 	}
 	else{
 		Node* n1 = nodes[record[0]];
-		Node* n2 = nodes[record[1]];
-	
-		//cout << "IDs in line: " << count << " does exist in our graph \n";
-		//cout << n1->id << " " << n2->id << endl;
-		
+		Node* n2 = nodes[record[1]];	
 		paths.push_back( pathfinder(n1 , n2));
 
 	}
-
-	//paths.push_back( pathfinder(n1 , n2));
-	
-	//cout << "read line\n";
-	//cout << pathfinder(n1 , n2) << endl;	
 	
 	count++;	
 	}
-	
-		
-	//cout << "exiting splice\n";
-	//cout << "count\n";
+	//returns a vector filled with paths beginning with the source node and ending with the requested node.
+	//if no path was found or nodes didn't exist, it will be a blank path for that pair.
 	return paths;
 
 }
@@ -131,8 +110,6 @@ bool Graph::loadFromFile(const char* in_filename) {
       continue;
     }
 
-    //TODO - YOU HAVE THE PAIR OF IDS OF 2 FRIENDS IN 'RECORD'. WHAT DO NEED TO DO NOW?
-
     addNode(record[0] , record[1]);
     count++;	
   }
@@ -142,29 +119,22 @@ bool Graph::loadFromFile(const char* in_filename) {
     return false;
   }
   
-  //cout << count << endl;
   infile.close();
   return true;
 }
 
 /* Implement pathfinder*/
-//TODO 
 string Graph::pathfinder(Node* from, Node* to) {
 	//initialize  dist and prev to infinity and nullptr respectively.
-	
-	//cout << "before the for loop in pathfinder function\n";
 	for(auto n = nodes.begin(); n != nodes.end() ; n++){
 		n->second->dist = INT_MAX;
 		n->second->prev = nullptr;
 	}
-	//cout << "after the for loop in pathfinder function\n";	
 
 	//initialize the queue. push source node in, set its distance to 0.
 	queue<Node*> q;
 	q.push(from);
 	from->dist = 0;
-
-	//cout << "this is inside the pathfinder function \n";
 	
 	//set distances for everyone.
 	while(!q.empty()){
@@ -177,35 +147,25 @@ string Graph::pathfinder(Node* from, Node* to) {
 				i->second->prev = curr;
 				q.push(i->second);
 			}
-			//check
-			//q.push(i->second);
 		}
 	}
-	//cout << "this is after the while loop inside pathfinder \n";
-
-		
+	//create string that will contain the path from "from" node to "to" node.	
 	string path = "";
 
 	//check if node * to was even reached. IE nodes aren't connected.
 	if(to->dist == INT_MAX)
 		return path;
 	
-	//if not start creating the path;
+	//if nodes were connected start creating the path by backtracking.
 	Node * back = to;
 	while(back->prev != nullptr){
 		path = " " + back->id + path;
 		
-		//cout << "ID: " << back->id << " prev: " << back->prev->id << endl;
-
-		//if(back->prev == nullptr)
-		//	cout << "this thing is null despite there being an ID for it.\n";
 	
 		back = back->prev;
 	}
-	//cout << "leaving pathfinder\n";
 	path = back->id + path;
 
-	//cout << path << endl;
 
 	return path;	
   

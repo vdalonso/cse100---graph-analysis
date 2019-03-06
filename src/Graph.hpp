@@ -7,7 +7,7 @@
 
 using namespace std;
 
-
+//implementation of node class.
 class Node{
 public:
 	unordered_map<string , Node*> adj;
@@ -23,7 +23,6 @@ public:
 
 class Graph {
  protected:
-  //MAYBE ADD CLASS DATA STRUCTURE(S) HERE
    unordered_map<string, Node*> nodes;
 
  public:
@@ -31,9 +30,6 @@ class Graph {
 
   ~Graph(void);
 
-  //MAYBE ADD SOME MORE METHODS HERE SO AS TO ANSWER QUESTIONS IN YOUR PA
-	
-  /* YOU CAN MODIFY THIS IF YOU LIKE , in_filename : THE INPUT FILENAME */
   vector<string> splice(const char* in_filename);
 
   void addNode(string id1, string id2);

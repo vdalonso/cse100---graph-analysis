@@ -28,30 +28,18 @@ int main(int argc, char* argv[]) {
   char* pairs_filename = argv[2];
   char* output_filename = argv[3];
 
-  cout << "i wonder if this will work \n";
-
-  //TODO   
- /* You can call the pathfinder function from here */
-
+  //create graph and send it the filename to build it.
   Graph mygraph;
   mygraph.loadFromFile(graph_filename);
-
+  //create a ofstream to write the the output file.
   ofstream outfile(output_filename);
-  
 
-  
-
+  //paths will contain the list of paths between two nodes.
   vector<string> paths = mygraph.splice(pairs_filename);
+  //for loop that goes through paths vector and prints out to outfile.
   for(unsigned int i = 0; i < paths.size() ; i++){
-	//cout << paths[paths.size()-(1+i)] << endl;
-	//outfile << paths[paths.size()-(1+i)] << endl;
 	outfile << paths[i] << endl;
-
   }
-
-  
-	
-
-  //cout << "This is the end.\n";
+  outfile.close();
     
 }  
