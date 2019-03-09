@@ -5,6 +5,8 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <stdlib.h>
+#include <algorithm>
 #include "Graph.hpp"
 
 using namespace std;
@@ -23,9 +25,28 @@ int main(int argc, char* argv[]) {
   }
   char* graph_filename = argv[1];
   char* output_filename = argv[3];
-  istringstream ss(argv[2]);
+  //istringstream ss(argv[2]);
+
+  int k = atoi(argv[2]);
 
  //TODO
  /* You can call the social gathering function from here */
+  //int k = atoi(ss.str());
+  //cout << k << endl;
+  
+
+  Graph mygraph;
+  mygraph.loadFromFile(graph_filename);
+  vector<int> invitees = mygraph.socialgathering(k);
+  sort(invitees.begin() , invitees.end());
+
+  //cout << mygraph.nodes.size() << endl;
+
+  ofstream out(output_filename);  
+
+  for(unsigned int i = 0 ; i < invitees.size() ; i++)
+	out << invitees[i] << endl;
+
+ //cout << k << endl;
 
 }

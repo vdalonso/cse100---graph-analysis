@@ -34,6 +34,8 @@ int main(int argc, char* argv[]) {
   //create a ofstream to write the the output file.
   ofstream outfile(output_filename);
 
+  cout << mygraph.nodes.size() << endl;
+
   //paths will contain the list of paths between two nodes.
   vector<string> paths = mygraph.splice(pairs_filename);
   //for loop that goes through paths vector and prints out to outfile.

@@ -12,7 +12,7 @@ class Node{
 public:
 	unordered_map<string , Node*> adj;
 	string id;
-
+	//int count:iiwew;
 	bool visited;
 	Node * prev;
 	int dist;
@@ -22,10 +22,9 @@ public:
 };
 
 class Graph {
- protected:
+ public:
    unordered_map<string, Node*> nodes;
 
- public:
   Graph(void);
 
   ~Graph(void);
@@ -38,7 +37,9 @@ class Graph {
 
   string pathfinder(Node* from, Node* to);
     
-  void socialgathering(vector<string>& invitees, const int& k);
+  vector<int> socialgathering(const int& k);
+
+ // bool myfunction(Node* n1 , Node* n2);
 
 };
 

@@ -1,6 +1,7 @@
 #include "Graph.hpp"
 
 #include <unordered_map>
+#include <vector>
 #include <algorithm>
 #include <fstream>
 #include <iostream>
@@ -12,6 +13,15 @@
 #include <queue>
 
 using namespace std;
+
+struct compare
+{
+	bool operator()(Node* n1 , Node*n2)
+	{
+		return (n1->adj.size() > n2->adj.size());
+	}
+
+};
 
 Graph::Graph(void)
     : nodes(0) {}
@@ -35,6 +45,11 @@ void Graph::addNode(string id1, string id2 ){
 		Node* n2 = new Node();
 		nodes.insert({id2,n2});
 	}
+
+	//if the ID's returned are of the same node, don't add a connection
+	//IE: self loop case.
+	if(id1 == id2)
+		return;
 
 	//undirected graph: for each pair, add both in both's adj list.
 	nodes[id1]->adj[id2] = nodes[id2];
@@ -152,6 +167,7 @@ string Graph::pathfinder(Node* from, Node* to) {
 	//create string that will contain the path from "from" node to "to" node.	
 	string path = "";
 
+
 	//check if node * to was even reached. IE nodes aren't connected.
 	if(to->dist == INT_MAX)
 		return path;
@@ -171,9 +187,38 @@ string Graph::pathfinder(Node* from, Node* to) {
   
 }
 
+
 /* Implement social gathering*/
 //TODO
-void Graph::socialgathering(vector<string>& invitees, const int& k) {
+//seems to work, no segfaults yet.
+vector<int> Graph::socialgathering( const int& k) {
+	priority_queue<Node* , vector<Node*> , compare > list;
+	//store nodes in vector list in accending order of adj list size.
+	for(auto itr = nodes.begin() ; itr != nodes.end() ; itr++){
+		list.push(itr->second);
+	}
+	
+	//this vector bellow is going to be the one we return with all id's (ints) that we invited to the party.
+	vector<int> invitees;
+	
+	//while we still have elements in our priority queue, look at the top
+	//and determine if it's less than k. if so remove it from queue and from all adj lists it belongs to.
+	//if not, push it into the array of invitees and pop it off.
+	while(!list.empty()){
+
+		if((int)list.top()->adj.size() < k){
+			for(auto itr2 = list.top()->adj.begin() ; itr2 != list.top()->adj.end() ; itr2++){	
+				itr2->second->adj.erase(list.top()->id);
+			}
+			list.pop();
+		}
+		else{
+			
+			invitees.push_back(stoi(list.top()->id));
+			list.pop();
+		}
+	}
+	
+	return invitees;
 
 }
-
