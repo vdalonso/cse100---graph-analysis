@@ -29,11 +29,6 @@ int main(int argc, char* argv[]) {
 
   int k = atoi(argv[2]);
 
- //TODO
- /* You can call the social gathering function from here */
-  //int k = atoi(ss.str());
-  //cout << k << endl;
-  
 
   Graph mygraph;
   mygraph.loadFromFile(graph_filename);

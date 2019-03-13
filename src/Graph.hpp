@@ -12,8 +12,9 @@ class Node{
 public:
 	unordered_map<string , Node*> adj;
 	string id;
-	//int count:iiwew;
-	bool visited;
+	int degree = 0;
+	int core;
+	bool visited = 0;
 	Node * prev;
 	int dist;
 

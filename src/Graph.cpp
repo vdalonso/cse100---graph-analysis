@@ -16,9 +16,9 @@ using namespace std;
 
 struct compare
 {
-	bool operator()(Node* n1 , Node*n2)
+	bool operator()( pair<int , Node* > n1 ,  pair<int , Node*> n2 )
 	{
-		return (n1->adj.size() > n2->adj.size());
+		return ( n1.first > n2.first );
 	}
 
 };
@@ -54,9 +54,12 @@ void Graph::addNode(string id1, string id2 ){
 	//undirected graph: for each pair, add both in both's adj list.
 	nodes[id1]->adj[id2] = nodes[id2];
 	nodes[id1]->id = id1;
+	nodes[id1]->degree++;
 
 	nodes[id2]->adj[id1] = nodes[id1];
 	nodes[id2]->id = id2;
+	nodes[id2]->degree++;
+
 	
 }
 //this method is for finding pairs. calls pathfinder.
@@ -190,12 +193,14 @@ string Graph::pathfinder(Node* from, Node* to) {
 
 /* Implement social gathering*/
 //TODO
-//seems to work, no segfaults yet.
+//seems to work, while loop is identical to k-core count algorithm.
 vector<int> Graph::socialgathering( const int& k) {
-	priority_queue<Node* , vector<Node*> , compare > list;
+	
+	priority_queue< pair<int , Node*> , vector< pair<int , Node*> > , compare > list;
 	//store nodes in vector list in accending order of adj list size.
 	for(auto itr = nodes.begin() ; itr != nodes.end() ; itr++){
-		list.push(itr->second);
+	//	cout << "Node ID: " << itr->second->id << " with degree : " << itr->second->degree << endl;
+		list.push({itr->second->degree , itr->second});
 	}
 	
 	//this vector bellow is going to be the one we return with all id's (ints) that we invited to the party.
@@ -205,19 +210,28 @@ vector<int> Graph::socialgathering( const int& k) {
 	//and determine if it's less than k. if so remove it from queue and from all adj lists it belongs to.
 	//if not, push it into the array of invitees and pop it off.
 	while(!list.empty()){
-
-		if((int)list.top()->adj.size() < k){
-			for(auto itr2 = list.top()->adj.begin() ; itr2 != list.top()->adj.end() ; itr2++){	
-				itr2->second->adj.erase(list.top()->id);
+		if(!list.top().second->visited){
+			pair<int , Node*> top = list.top();
+			top.second->visited = true;
+			list.pop();
+			top.second->core = top.first;
+			for(auto itr2 = top.second->adj.begin() ; itr2 != top.second->adj.end() ; itr2++ ){
+				if(itr2->second->degree > top.second->degree){
+					itr2->second->degree--;
+					list.push({itr2->second->degree , itr2->second});
+				}
 			}
-			list.pop();
 		}
-		else{
-			
-			invitees.push_back(stoi(list.top()->id));
+		else
 			list.pop();
-		}
 	}
+	
+	for(auto itr3 = nodes.begin() ; itr3 != nodes.end() ; itr3++){
+		if(itr3->second->core >= k)
+			invitees.push_back(stoi(itr3->second->id));
+
+	}
+
 	
 	return invitees;
 
