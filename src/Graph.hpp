@@ -11,6 +11,8 @@ using namespace std;
 class Node{
 public:
 	unordered_map<string , Node*> adj;
+	unordered_map<string , int> weights;
+
 	string id;
 	int degree = 0;
 	int core;
@@ -32,9 +34,13 @@ class Graph {
 
   vector<string> splice(const char* in_filename);
 
-  void addNode(string id1, string id2);
+  void addNode(string id1, string id2 , int w);
 
   bool loadFromFile(const char* in_filename);
+
+  bool loadFromFile3(const char* in_filename);
+
+  void prims(const char* outfile , string user);
 
   string pathfinder(Node* from, Node* to);
     

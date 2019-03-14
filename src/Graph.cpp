@@ -14,6 +14,15 @@
 
 using namespace std;
 
+struct compare3
+{
+	bool operator() (pair<Node* , Node*> n1 , pair<Node* , Node* > n2)
+	{
+		return (n1.first->weights[n1.second->id] > n2.first->weights[n2.second->id]);
+	}
+
+};
+
 struct compare
 {
 	bool operator()( pair<int , Node* > n1 ,  pair<int , Node*> n2 )
@@ -34,15 +43,17 @@ Graph::~Graph(void) {
 
 /* Add a node to the graph representing person with id idNumber and add a connection between two nodes in the graph. */
 
-void Graph::addNode(string id1, string id2 ){
+void Graph::addNode(string id1, string id2 , int w){
 
 	//First, check if ID's already exist in nodes map. If not, create them and store them.
 	if(nodes.find(id1) == nodes.end()){
 		Node* n1 = new Node();
+		//cout << "inserting node1\n";
 		nodes.insert({id1,n1});
 	}
 	if(nodes.find(id2) == nodes.end()){
 		Node* n2 = new Node();
+		//cout << "inserting node2\n";
 		nodes.insert({id2,n2});
 	}
 
@@ -53,10 +64,12 @@ void Graph::addNode(string id1, string id2 ){
 
 	//undirected graph: for each pair, add both in both's adj list.
 	nodes[id1]->adj[id2] = nodes[id2];
+	nodes[id1]->weights[id2] = w;
 	nodes[id1]->id = id1;
 	nodes[id1]->degree++;
 
 	nodes[id2]->adj[id1] = nodes[id1];
+	nodes[id2]->weights[id1] = w;
 	nodes[id2]->id = id2;
 	nodes[id2]->degree++;
 
@@ -128,7 +141,7 @@ bool Graph::loadFromFile(const char* in_filename) {
       continue;
     }
 
-    addNode(record[0] , record[1]);
+    addNode(record[0] , record[1] , 1);
     count++;	
   }
 
@@ -140,6 +153,98 @@ bool Graph::loadFromFile(const char* in_filename) {
   infile.close();
   return true;
 }
+
+
+bool Graph::loadFromFile3(const char* in_filename) {
+  ifstream infile(in_filename);
+  int count = 0;
+	
+  while (infile) {
+    string s;
+    string delimiter = " ";
+    if (!getline(infile, s)) break;
+
+    //istringstream ss(s);
+    //cout << s <<endl;
+    vector<string> record;
+    size_t pos = 0;
+    string token;
+
+    while ( (pos = s.find(delimiter)) != std::string::npos) {
+      token = s.substr(0 , pos);
+	//cout << token <<endl;
+      //if (!getline(ss, s, ' ')) break;
+      record.push_back(token);
+      s.erase(0, pos + delimiter.length() );
+    }
+	record.push_back(s);
+	//cout << "out of while loop\n";
+
+    if (record.size() != 3) {
+      continue;
+    }
+    //cout << record[0] << " " << record[1] << " " << record[2] << endl;
+    addNode(record[0] , record[1] , stoi(record[2]));
+    count++;	
+  }
+
+  if (!infile.eof()) {
+    cerr << "Failed to read " << in_filename << "!\n";
+    return false;
+  }
+  
+  infile.close();
+  return true;
+}
+//Prim's Algorithm, used to find the Minimun Spanning Tree of a build graph.
+//in this case, we will use it to see the order of which we can make friends.
+
+void Graph::prims(const char* outfile , string user){
+	
+	ofstream out(outfile);
+
+	if(nodes.empty())
+		cout << "nodes is empty...\n";
+		
+	for(auto n = nodes.begin(); n != nodes.end() ; n++){
+		n->second->visited = false;
+		n->second->prev = nullptr;
+	}
+	//priority queue of two nodes <from , to> 
+	//less cost/weight between then means higher priority.
+	priority_queue< pair<Node* , Node*> , vector< pair<Node* , Node*> > , compare3 > list; 
+	nodes[user]->visited = true;
+	
+	//for all neighbors of "user" add them as pairs to the queue <user , neighbor_i>
+	for(auto itr = nodes[user]->adj.begin() ; itr != nodes[user]->adj.end() ; itr++){
+
+		//cout << nodes[user]->weights[itr->second->id] << endl;
+		list.push({nodes[user] , itr->second});
+
+	}
+
+
+	//cout << "before while loop\n";	
+	while(!list.empty()){
+		pair<Node* , Node*> top = list.top();
+		list.pop();
+		if(!top.second->visited){
+			if(nodes[user]->adj.find(top.second->id) == nodes[user]->adj.end()){
+				out << top.second->id <<endl;
+			}
+			top.second->visited = true;
+			top.second->prev = top.first;
+			for(auto itr = top.second->adj.begin() ; itr != top.second->adj.end() ; itr++){
+				list.push({top.second , itr->second});
+			}
+		}
+	}
+	//cout << "out of the while loop, no infinite loops!\n";
+	
+	out.close();	
+}
+
+
 
 /* Implement pathfinder*/
 string Graph::pathfinder(Node* from, Node* to) {
@@ -230,9 +335,9 @@ vector<int> Graph::socialgathering( const int& k) {
 		if(itr3->second->core >= k)
 			invitees.push_back(stoi(itr3->second->id));
 
-	}
-
-	
+	}	
 	return invitees;
 
 }
+
+

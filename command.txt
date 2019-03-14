@@ -1,0 +1,1 @@
+./build/task3 ./data/fb_small.txt 4 ./outfile1 && ./build/task3 ./data/fb_combined2.txt 2453 ./outfile2
